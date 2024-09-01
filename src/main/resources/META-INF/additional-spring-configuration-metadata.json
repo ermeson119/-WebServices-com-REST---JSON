@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "spring.mvc.contentnegotiation.favor-path-extension",
+      "type": "java.lang.String",
+      "description": "Description for spring.mvc.contentnegotiation.favor-path-extension."
+    },
+    {
+      "name": "spring.mvc.default-media-type",
+      "type": "java.lang.String",
+      "description": "Description for spring.mvc.default-media-type."
+    }
+  ] }
