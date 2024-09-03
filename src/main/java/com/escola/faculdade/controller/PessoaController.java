@@ -25,17 +25,17 @@ public class PessoaController {
 
 
     @PostMapping("/form")
-    public Pessoa createCurso(@Valid @RequestBody Pessoa pessoa) {
+    public Pessoa createPessoa(@Valid @RequestBody Pessoa pessoa) {
 
 
         List<Telefone> novosTelefones = new ArrayList<>();
 
         for (Telefone telefone : pessoa.getTelefones()) {
-
-            Telefone newTelefone = new Telefone();
-            newTelefone.setDd(telefone.getDd());
-            newTelefone.setNumero(telefone.getNumero());
-            telefoneRepository.save(newTelefone);
+            Telefone newTelefone = telefoneRepository.findById(telefone.getId()).orElseThrow();
+//            Telefone newTelefone = new Telefone();
+//            newTelefone.setDd(telefone.getDd());
+//            newTelefone.setNumero(telefone.getNumero());
+//            telefoneRepository.save(newTelefone);
             novosTelefones.add(newTelefone);
         }
 
@@ -47,33 +47,60 @@ public class PessoaController {
 
 
     @GetMapping("/list")
-    public List<Pessoa> getAllEstudantes() {
+    public List<Pessoa> getAllPessoa() {
         return pessoaRepository.findAll();
     }
 
 
     @GetMapping("/buscar/{id}")
-    Optional<Pessoa> getCursoById(@PathVariable Integer id) {
+    Optional<Pessoa> getPessoaById(@PathVariable Integer id) {
         return pessoaRepository.findById(id);
     }
 
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Pessoa> atualizarOuCriar(@RequestBody Pessoa novoPessoa, @PathVariable Integer id) {
-
-        Pessoa pessoaAtualizado = pessoaRepository.findById(id)
+    public ResponseEntity<Pessoa> update(@RequestBody Pessoa novoPessoa, @PathVariable Integer id) {
+        Pessoa pessoaAtualizada = pessoaRepository.findById(id)
                 .map(pessoa -> {
                     pessoa.setNome(novoPessoa.getNome());
-                    pessoa.setTelefones(novoPessoa.getTelefones());
+                    pessoa.getTelefones().clear();
+
+                    if (novoPessoa.getTelefones() != null) {
+                        List<Telefone> novosTelefones = new ArrayList<>();
+
+                        for (Telefone telefone : novoPessoa.getTelefones()) {
+                            Telefone newTelefone = telefoneRepository.findById(telefone.getId())
+                                    .orElseThrow(() -> new RuntimeException("Telefone não encontrado: " + telefone.getId()));
+                            novosTelefones.add(newTelefone);
+                        }
+
+                        pessoa.getTelefones().addAll(novosTelefones);
+                    }
+
                     return pessoaRepository.save(pessoa);
                 })
                 .orElseGet(() -> {
                     novoPessoa.setId(id);
+                    if (novoPessoa.getTelefones() != null) {
+                        List<Telefone> novosTelefones = new ArrayList<>();
+
+                        for (Telefone telefone : novoPessoa.getTelefones()) {
+                            Telefone newTelefone = telefoneRepository.findById(telefone.getId())
+                                    .orElseThrow(() -> new RuntimeException("Telefone não encontrado: " + telefone.getId()));
+                            novosTelefones.add(newTelefone);
+
+                        }
+                        novoPessoa.setTelefones(novosTelefones);
+
+                    } else {
+                        novoPessoa.setTelefones(new ArrayList<>());
+                    }
                     return pessoaRepository.save(novoPessoa);
                 });
 
-        return ResponseEntity.ok(pessoaAtualizado);
+        return ResponseEntity.ok(pessoaAtualizada);
     }
+
 
     @DeleteMapping("/deletar/{id}")
     public void  delete(@PathVariable Integer id)  {

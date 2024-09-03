@@ -16,23 +16,23 @@ public class TelefoneController {
     TelefoneRepository telefoneRepository;
 
     @PostMapping("/form")
-    public Telefone createCurso(@Valid @RequestBody Telefone notebook) {
-        return telefoneRepository.save(notebook);
+    public Telefone createTelefone(@Valid @RequestBody Telefone telefone) {
+        return telefoneRepository.save(telefone);
     }
 
     @GetMapping("/list")
-    public List<Telefone> getAllCurso() {
+    public List<Telefone> getAllTelefone() {
         return telefoneRepository.findAll();
     }
 
 
     @GetMapping("/buscar/{id}")
-    Optional<Telefone> getCursoById(@PathVariable Integer id) {
+    Optional<Telefone> getTelefoneById(@PathVariable Integer id) {
         return telefoneRepository.findById(id);
     }
 
     @PutMapping("/atualizar/{id}")
-    Telefone updateOrCreate(@RequestBody Telefone novoTelefone, @PathVariable Integer id) {
+    Telefone update(@RequestBody Telefone novoTelefone, @PathVariable Integer id) {
 
         return telefoneRepository.findById(id)
                 .map(telefone -> {
